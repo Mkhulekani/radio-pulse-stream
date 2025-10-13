@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Clock, Plus } from 'lucide-react';
+import { Search, Clock, Plus, Trash2 } from 'lucide-react';
 import { DATABASE } from '@/data/database';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/AppContext';
 
 const Shows = () => {
+  const [shows, setShows] = useState(DATABASE.shows);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,7 +23,7 @@ const Shows = () => {
   });
   const { showNotification } = useApp();
 
-  const filteredShows = DATABASE.shows.filter(show => 
+  const filteredShows = shows.filter(show => 
     show.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     show.genre.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -39,6 +40,12 @@ const Shows = () => {
       schedule: '',
       artwork: ''
     });
+  };
+
+  const handleDelete = (showId: number, showName: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setShows(shows.filter(show => show.id !== showId));
+    showNotification(`Show "${showName}" deleted successfully!`);
   };
 
   return (
@@ -148,8 +155,16 @@ const Shows = () => {
           <Link 
             key={show.id}
             to={`/shows/${show.id}`}
-            className="bg-card rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-all transform hover:-translate-y-2"
+            className="bg-card rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-all transform hover:-translate-y-2 relative group"
           >
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => handleDelete(show.id, show.name, e)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
             <img src={show.artwork} alt={show.name} className="w-full h-48 object-cover" />
             <div className="p-6">
               <div className="text-sm text-primary font-semibold mb-2">{show.genre}</div>

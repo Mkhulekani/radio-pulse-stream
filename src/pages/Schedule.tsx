@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DATABASE } from '@/data/database';
 import { useApp } from '@/contexts/AppContext';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 const Schedule = () => {
   const { showNotification } = useApp();
+  const [shows, setShows] = useState(DATABASE.shows);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -26,6 +27,12 @@ const Schedule = () => {
     showNotification(`Show "${formData.name}" added to schedule!`);
     setIsDialogOpen(false);
     setFormData({ name: '', host: '', genre: '', description: '', schedule: '', artwork: '' });
+  };
+
+  const handleDelete = (showId: number, showName: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setShows(shows.filter(show => show.id !== showId));
+    showNotification(`Show "${showName}" removed from schedule!`);
   };
 
   return (
@@ -107,12 +114,20 @@ const Schedule = () => {
       </div>
       <div className="bg-card rounded-xl shadow-lg p-8">
         <div className="space-y-6">
-          {DATABASE.shows.map(show => (
+          {shows.map(show => (
             <Link 
               key={show.id} 
               to={`/shows/${show.id}`}
-              className="flex items-center gap-6 p-4 hover:bg-muted rounded-lg transition cursor-pointer"
+              className="flex items-center gap-6 p-4 hover:bg-muted rounded-lg transition cursor-pointer relative group"
             >
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => handleDelete(show.id, show.name, e)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
               <img src={show.artwork} alt={show.name} className="w-20 h-20 rounded-lg" />
               <div className="flex-1">
                 <h3 className="font-bold text-lg">{show.name}</h3>
