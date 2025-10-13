@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DATABASE } from '@/data/database';
 import { useApp } from '@/contexts/AppContext';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 const Hosts = () => {
   const { showNotification } = useApp();
+  const [hosts, setHosts] = useState(DATABASE.hosts);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -24,6 +25,11 @@ const Hosts = () => {
     showNotification(`Host "${formData.name}" added successfully!`);
     setIsDialogOpen(false);
     setFormData({ name: '', bio: '', photo: '', instagram: '', twitter: '' });
+  };
+
+  const handleDelete = (hostId: number, hostName: string) => {
+    setHosts(hosts.filter(host => host.id !== hostId));
+    showNotification(`Host "${hostName}" deleted successfully!`);
   };
 
   return (
@@ -94,8 +100,16 @@ const Hosts = () => {
         </Dialog>
       </div>
       <div className="grid md:grid-cols-3 gap-8">
-        {DATABASE.hosts.map(host => (
-          <div key={host.id} className="bg-card rounded-xl shadow-lg overflow-hidden">
+        {hosts.map(host => (
+          <div key={host.id} className="bg-card rounded-xl shadow-lg overflow-hidden relative group">
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => handleDelete(host.id, host.name)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
             <img src={host.photo} alt={host.name} className="w-full h-64 object-cover" />
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2">{host.name}</h3>
