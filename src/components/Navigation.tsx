@@ -82,6 +82,12 @@ export const Navigation = () => {
             >
               Shop
             </Link>
+            <Link 
+              to="/about" 
+              className={`hover:text-primary transition ${isActive('/about') ? 'text-primary' : ''}`}
+            >
+              About Us
+            </Link>
             <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
               <DialogTrigger asChild>
                 <button className="bg-primary px-4 py-2 rounded-full hover:opacity-90 transition">
@@ -179,6 +185,7 @@ export const Navigation = () => {
             <Link to="/shows" className="block w-full text-left py-2 hover:text-primary" onClick={() => setMenuOpen(false)}>Shows</Link>
             <Link to="/events" className="block w-full text-left py-2 hover:text-primary" onClick={() => setMenuOpen(false)}>Events</Link>
             <Link to="/shop" className="block w-full text-left py-2 hover:text-primary" onClick={() => setMenuOpen(false)}>Shop</Link>
+            <Link to="/about" className="block w-full text-left py-2 hover:text-primary" onClick={() => setMenuOpen(false)}>About Us</Link>
             <Link to="/cart" className="block w-full text-left py-2 hover:text-primary" onClick={() => setMenuOpen(false)}>Cart ({cart.length})</Link>
           </div>
         )}
