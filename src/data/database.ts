@@ -120,7 +120,7 @@ export const DATABASE = {
   memberships: [
     {
       id: 1,
-      tier: "Free",
+      tier: "Join",
       price: 0,
       features: ["Access to live stream", "Weekly newsletter", "Show schedule"]
     },
