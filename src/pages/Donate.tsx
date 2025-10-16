@@ -1,13 +1,34 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useNavigate } from 'react-router-dom';
+import { DATABASE } from '@/data/database';
 
 const Donate = () => {
   const [donationAmount, setDonationAmount] = useState(100);
   const [isRecurring, setIsRecurring] = useState(false);
-  const { showNotification } = useApp();
+  const { showNotification, subscribeMembership } = useApp();
+  const navigate = useNavigate();
 
   const handleDonate = () => {
+    // Determine membership tier based on donation amount
+    let membership = DATABASE.memberships[0]; // Free tier
+    
+    if (donationAmount >= 200) {
+      membership = DATABASE.memberships[2]; // VIP tier
+    } else if (donationAmount >= 100) {
+      membership = DATABASE.memberships[1]; // Premium tier
+    }
+
     showNotification(`Thank you for donating R${donationAmount}!`);
+    
+    // Grant membership based on donation
+    if (membership.id !== 1) {
+      subscribeMembership(membership);
+      setTimeout(() => {
+        navigate('/membership');
+      }, 1500);
+    }
+    
     setDonationAmount(100);
     setIsRecurring(false);
   };
