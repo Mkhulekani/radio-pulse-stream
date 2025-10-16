@@ -2,13 +2,36 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Radio, Menu, X, ShoppingCart, Heart } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export const Navigation = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { cart, userMembership } = useApp();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [isSignIn, setIsSignIn] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    password: ''
+  });
+  const { cart, userMembership, showNotification } = useApp();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSignIn) {
+      showNotification('Signed in successfully!');
+    } else {
+      showNotification('Signed up successfully!');
+      setIsSignIn(true);
+    }
+    setFormData({ name: '', surname: '', email: '', password: '' });
+  };
 
   return (
     <nav className="bg-black text-white sticky top-0 z-40 shadow-lg">
@@ -56,12 +79,82 @@ export const Navigation = () => {
             >
               Shop
             </Link>
-            <Link 
-              to="/membership" 
-              className="bg-primary px-4 py-2 rounded-full hover:opacity-90 transition"
-            >
-              {userMembership ? userMembership.tier : 'Join'}
-            </Link>
+            {userMembership ? (
+              <Link 
+                to="/membership" 
+                className="bg-primary px-4 py-2 rounded-full hover:opacity-90 transition"
+              >
+                {userMembership.tier}
+              </Link>
+            ) : (
+              <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary px-4 py-2 rounded-full hover:opacity-90 transition">
+                    Join
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{isSignIn ? 'Sign In' : 'Sign Up'}</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {!isSignIn && (
+                      <>
+                        <div>
+                          <Label htmlFor="name">Name</Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="surname">Surname</Label>
+                          <Input
+                            id="surname"
+                            value={formData.surname}
+                            onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
+                            required
+                          />
+                        </div>
+                      </>
+                    )}
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <Button type="submit" className="w-full">
+                      {isSignIn ? 'Sign In' : 'Sign Up'}
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      className="w-full"
+                      onClick={() => setIsSignIn(!isSignIn)}
+                    >
+                      {isSignIn ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
             <Link 
               to="/donate" 
               className="text-primary hover:opacity-80 transition"
