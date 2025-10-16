@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Radio, Menu, X, ShoppingCart, Heart } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -19,6 +19,7 @@ export const Navigation = () => {
   });
   const { cart, userMembership, showNotification } = useApp();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -26,6 +27,8 @@ export const Navigation = () => {
     e.preventDefault();
     if (isSignIn) {
       showNotification('Signed in successfully!');
+      setAuthDialogOpen(false);
+      navigate('/donate');
     } else {
       showNotification('Signed up successfully!');
       setIsSignIn(true);

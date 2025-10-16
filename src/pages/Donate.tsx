@@ -20,6 +20,17 @@ const Donate = () => {
       </div>
 
       <div className="bg-card rounded-2xl shadow-xl p-8 mb-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">What Your Donation Supports</h2>
+          <div className="space-y-3 text-muted-foreground">
+            <p>• <strong>Equipment & Studio Maintenance</strong> - Keep our broadcast quality professional</p>
+            <p>• <strong>Host Compensation</strong> - Support the talented voices that make our shows</p>
+            <p>• <strong>Community Events</strong> - Fund free events and workshops for the community</p>
+            <p>• <strong>Operating Costs</strong> - Cover streaming, website, and administrative expenses</p>
+            <p>• <strong>Independent Content</strong> - Ensure ad-free, community-driven programming</p>
+          </div>
+        </div>
+
         <h2 className="text-2xl font-bold mb-6">Choose Your Contribution</h2>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -64,8 +75,14 @@ const Donate = () => {
           onClick={handleDonate}
           className="w-full bg-primary text-primary-foreground py-4 rounded-full text-lg font-semibold hover:opacity-90 transition"
         >
-          Donate R{donationAmount} {isRecurring ? 'Monthly' : 'Once'}
+          Proceed to Secure Payment
         </button>
+
+        <div className="mt-6 p-4 bg-muted rounded-lg">
+          <p className="text-sm text-muted-foreground text-center">
+            🔒 Secure payment processing • You'll receive a confirmation email and receipt after your donation
+          </p>
+        </div>
       </div>
     </div>
   );
