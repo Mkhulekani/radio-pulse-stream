@@ -2,14 +2,16 @@ import { Link } from 'react-router-dom';
 import { Play, Pause, Clock, Calendar, MapPin } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { DATABASE } from '@/data/database';
+import heroBackground from '@/assets/hero-background.avif';
 
 const Home = () => {
   const { isPlaying, togglePlay, registerForEvent, registeredEvents, setCurrentTrack, setIsPlaying } = useApp();
 
   return (
     <div className="pb-24">
-      <div className="relative h-[600px] bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
-        <div className="absolute inset-0 bg-black/40"></div>
+      <div className="relative h-[600px] text-white">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroBackground})` }}></div>
+        <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative max-w-7xl mx-auto px-4 h-full flex flex-col justify-center">
           <h1 className="text-6xl md:text-7xl font-bold mb-4">
             Your Sound.<br />Your Community.
