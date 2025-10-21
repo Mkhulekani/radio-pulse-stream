@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import type { Show, Membership, Product } from '@/data/database';
 
 interface CartItem {
@@ -55,6 +55,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<CurrentTrack>({
     show: "Morning Vibes",
@@ -71,12 +72,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [notification, setNotification] = useState<NotificationType | null>(null);
   const [playbackTime, setPlaybackTime] = useState(0);
 
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio('https://stream.radio.co/s8e05a5c4c/listen');
+    audioRef.current.volume = volume / 100;
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Update audio volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume / 100;
+    }
+  }, [volume, isMuted]);
+
+  // Handle playback timer
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(() => {
         setPlaybackTime(prev => prev + 1);
       }, 1000);
       return () => clearInterval(interval);
+    } else {
+      setPlaybackTime(0);
     }
   }, [isPlaying]);
 
@@ -85,9 +109,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    showNotification(isPlaying ? 'Playback paused' : 'Now playing live!');
+  const togglePlay = async () => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      showNotification('Playback paused');
+    } else {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+        showNotification('Now playing live!');
+      } catch (error) {
+        console.error('Error playing audio:', error);
+        showNotification('Unable to play audio', 'error');
+      }
+    }
   };
 
   const toggleMute = () => {
