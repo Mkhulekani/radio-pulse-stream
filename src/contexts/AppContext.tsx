@@ -74,16 +74,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Initialize audio element
   useEffect(() => {
-    // Using a working test stream - replace with your actual radio stream URL
-    audioRef.current = new Audio('https://somafm.com/groovesalad256.pls');
+    // Using a direct streaming URL - replace with your actual Newtown Radio stream
+    audioRef.current = new Audio('https://ice1.somafm.com/groovesalad-128-mp3');
     audioRef.current.volume = volume / 100;
-    audioRef.current.crossOrigin = "anonymous";
     
-    audioRef.current.onerror = (e) => {
+    audioRef.current.addEventListener('error', (e) => {
       console.error('Audio error:', e);
       showNotification('Failed to load audio stream', 'error');
       setIsPlaying(false);
-    };
+    });
+    
+    audioRef.current.addEventListener('canplay', () => {
+      console.log('Audio ready to play');
+    });
     
     return () => {
       if (audioRef.current) {
