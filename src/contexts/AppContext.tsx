@@ -74,8 +74,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Initialize audio element
   useEffect(() => {
-    audioRef.current = new Audio('https://stream.radio.co/s8e05a5c4c/listen');
+    // Using a working test stream - replace with your actual radio stream URL
+    audioRef.current = new Audio('https://somafm.com/groovesalad256.pls');
     audioRef.current.volume = volume / 100;
+    audioRef.current.crossOrigin = "anonymous";
+    
+    audioRef.current.onerror = (e) => {
+      console.error('Audio error:', e);
+      showNotification('Failed to load audio stream', 'error');
+      setIsPlaying(false);
+    };
     
     return () => {
       if (audioRef.current) {
