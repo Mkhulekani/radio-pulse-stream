@@ -21,6 +21,12 @@ interface CurrentTrack {
   artwork: string;
 }
 
+interface Genre {
+  name: string;
+  streamUrl: string;
+  description: string;
+}
+
 interface NotificationType {
   message: string;
   type: 'success' | 'error' | 'info';
@@ -50,13 +56,25 @@ interface AppContextType {
   notification: NotificationType | null;
   showNotification: (message: string, type?: 'success' | 'error' | 'info') => void;
   playbackTime: number;
+  genres: Genre[];
+  currentGenre: string;
+  switchGenre: (genreName: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const genres: Genre[] = [
+    { name: "Maskandi", streamUrl: "https://ice1.somafm.com/folkfwd-128-mp3", description: "Traditional Zulu music" },
+    { name: "Gospel", streamUrl: "https://ice1.somafm.com/christmas-128-mp3", description: "Inspirational gospel music" },
+    { name: "R&B", streamUrl: "https://ice1.somafm.com/groovesalad-128-mp3", description: "Smooth R&B vibes" },
+    { name: "Deep House", streamUrl: "https://ice1.somafm.com/deepspaceone-128-mp3", description: "Deep house beats" },
+    { name: "Hip Hop", streamUrl: "https://ice1.somafm.com/bootliquor-128-mp3", description: "Hip hop classics" },
+  ];
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentGenre, setCurrentGenre] = useState("R&B");
   const [currentTrack, setCurrentTrack] = useState<CurrentTrack>({
     show: "Morning Vibes",
     host: "DJ Sarah",
@@ -74,8 +92,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Initialize audio element
   useEffect(() => {
-    // Using a direct streaming URL - replace with your actual Newtown Radio stream
-    audioRef.current = new Audio('https://ice1.somafm.com/groovesalad-128-mp3');
+    const genreStream = genres.find(g => g.name === currentGenre);
+    audioRef.current = new Audio(genreStream?.streamUrl || genres[2].streamUrl);
     audioRef.current.volume = volume / 100;
     
     audioRef.current.addEventListener('error', (e) => {
@@ -94,7 +112,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         audioRef.current = null;
       }
     };
-  }, []);
+  }, [currentGenre]);
 
   // Update audio volume
   useEffect(() => {
@@ -183,6 +201,32 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     showNotification(`Welcome to ${membership.tier} membership!`);
   };
 
+  const switchGenre = async (genreName: string) => {
+    const wasPlaying = isPlaying;
+    
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+    
+    setCurrentGenre(genreName);
+    showNotification(`Switched to ${genreName}`);
+    
+    // If was playing, start new genre automatically
+    if (wasPlaying) {
+      setTimeout(async () => {
+        if (audioRef.current) {
+          try {
+            await audioRef.current.play();
+            setIsPlaying(true);
+          } catch (error) {
+            console.error('Error playing new genre:', error);
+          }
+        }
+      }, 500);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -209,6 +253,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         notification,
         showNotification,
         playbackTime,
+        genres,
+        currentGenre,
+        switchGenre,
       }}
     >
       {children}

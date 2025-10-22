@@ -11,7 +11,10 @@ export const LivePlayer = () => {
     isMuted, 
     toggleMute,
     showNotification,
-    playbackTime 
+    playbackTime,
+    genres,
+    currentGenre,
+    switchGenre
   } = useApp();
 
   const formatTime = (seconds: number) => {
@@ -26,6 +29,28 @@ export const LivePlayer = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-purple-900 to-indigo-900 text-white shadow-2xl z-50">
+      {/* Genre Selection */}
+      <div className="border-b border-purple-700/50 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          <div className="flex gap-2 min-w-max">
+            {genres.map((genre) => (
+              <button
+                key={genre.name}
+                onClick={() => switchGenre(genre.name)}
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                  currentGenre === genre.name
+                    ? 'bg-white text-purple-900'
+                    : 'bg-purple-800/50 hover:bg-purple-700/50'
+                }`}
+              >
+                {genre.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Player Controls */}
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -37,7 +62,7 @@ export const LivePlayer = () => {
             <div className="flex-1 min-w-0">
               <div className="font-bold text-sm truncate">{currentTrack.track}</div>
               <div className="text-xs text-purple-200 truncate">
-                {currentTrack.show} • {currentTrack.host}
+                {currentTrack.show} • {currentTrack.host} • {currentGenre}
               </div>
               {isPlaying && (
                 <div className="text-xs text-purple-300 mt-1">
